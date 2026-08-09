@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/styles.css">
+    <title>Root</title>
+</head>
+<body>
+
+    <div class="container username-container">
+        <h2>👤 Ваш профиль</h2>
+
+        <div class="username-form">
+            <input
+                type="text"
+                id="usernameInput"
+                placeholder="Введите ваше имя..."
+                maxlength="30"
+            >
+
+            <button id="createUsernameBtn">
+                Установить
+            </button>
+        </div>
+
+        <p class="current-username">
+            Ваше имя:
+            <span id="username">Не установлено</span>
+        </p>
+    </div>
+
+    <div class="container room-container">
+
+        <div class="logo">▶</div>
+
+        <h1>Watch Together</h1>
+
+        <p class="subtitle">
+            Создай комнату и пригласи друзей
+            для совместного просмотра.
+        </p>
+
+        <button
+            onclick="createRoom()"
+            id="createRoomBtn"
+        >
+            Создать комнату
+        </button>
+
+        <p id="parag"></p>
+        <div id="roomInfo">
+            <span class="room-label">Код комнаты</span>
+            <span id="roomID"></span>
+        </div>
+
+    </div>
+
+    <script>
+        async function createRoom() {
+            const roomBtn = document.getElementById("createRoomBtn");
+            const newRoomCode = document.getElementById("parag");
+            const roomId = document.getElementById('roomID');
+            const roomInfo = document.getElementById("roomInfo");
+
+            const response = await fetch("/create_room", {method: "POST"});
+            const data = await response.json();
+
+            newRoomCode.innerHTML = `Комната создана: <a href='${data.link}'>Перейти</a>`;
+            roomId.innerText = data.room_id;
+
+            roomInfo.style.display = "flex";
+        }
+
+        const usernameInp = document.getElementById('usernameInput');
+        const usernameBtn = document.getElementById('createUsernameBtn');
+        const spanUsername = document.getElementById('username');
+
+        usernameBtn.addEventListener('click', () => {
+
+            const username = usernameInp.value
+            if (username.trim() === "") return;
+
+            spanUsername.innerText = username;
+        })
+
+    </script>
+</body>
+</html>
