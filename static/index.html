@@ -82,6 +82,8 @@
             if (username.trim() === "") return;
 
             spanUsername.innerText = username;
+
+            localStorage.setItem("username", username);
         })
 
     </script>

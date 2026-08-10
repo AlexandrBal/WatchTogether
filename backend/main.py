@@ -22,7 +22,7 @@ app.mount(
     StaticFiles(directory="static"),
     name="static")
 
-rooms={}
+relations = {}
 
 @app.get('/')
 async def index():
@@ -31,11 +31,6 @@ async def index():
 @app.post('/create_room')
 async def create_room():
     room_id = secrets.token_urlsafe(16)
-
-    rooms[room_id] = {
-        'notes': [],
-        'created_at': '2026-08-08'
-    }
 
     link = f'/rooms/{room_id}'
 
@@ -46,10 +41,18 @@ async def create_room():
 
 @app.get('/rooms/{room_id}')
 async def get_room(room_id: str, request: Request):
-    if room_id not in rooms:
-        raise HTTPException(status_code=404, detail="Not found")
-
     return templates.TemplateResponse(request=request, name='room.html', context={
-        'room_id': room_id,
-        'notes': rooms[room_id]['notes']
+        'room_id': room_id
     })
+
+@sio.on('join_room')
+async def join_room(sid, data):
+    relations[sid] = {
+        'name': data['username'],
+        'room': data['room_id']
+    }
+    await sio.enter_room(sid, data['room_id'])
+
+@sio.on('load_video')
+async def load_video(sid, data):
+    await sio.emit('load_video', data)
