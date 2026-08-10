@@ -55,4 +55,4 @@ async def join_room(sid, data):
 
 @sio.on('load_video')
 async def load_video(sid, data):
-    await sio.emit('load_video', data)
+    await sio.emit('load_video', data, room=relations[sid]['room'])

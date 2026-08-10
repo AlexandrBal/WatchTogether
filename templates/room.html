@@ -3,21 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/roomStyles.css">
     <title>Room</title>
 </head>
 <body>
-    <span>Код комнаты: </span>
-    <span id="roomIdSpan">{{ room_id }}</span>
-
-    <div class="inputUrl">
-        <input id="videoUrl" type="text" placeholder="Введите ссылку на видео...">
-        <button id="newVideoBtn">Установить</button>
+    <div class="room-info">
+        <span class="room-label">Код комнаты: </span>
+        <span id="roomIdSpan">{{ room_id }}</span>
     </div>
 
-    <div id="player"></div>
+    <div class="video-container">
+        <div class="inputUrl">
+            <input id="videoUrl" type="text" placeholder="Введите ссылку на видео...">
+            <button id="newVideoBtn">Установить</button>
+        </div>
+
+        <div id="player"></div>
+    </div>
 
     <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
-    <script src="https://www.youtube.com/iframe_api"></script>
     <script>
         let player;
         const videoBtn = document.getElementById('newVideoBtn');
@@ -30,18 +34,49 @@
         })
 
         function onYouTubeIframeAPIReady() {
+
             player = new YT.Player('player', {
-                height: "390",
-                width: "640",
+                height: '390',
+                width: '640',
+
+                videoId: '',
+
+                playerVars: {
+                    autoplay: 0,
+                    playsinline: 1,
+                    rel: 0,
+                    controls: 1,
+                    origin: window.location.origin
+                },
+
                 events: {
-                'onReady' : onPlayerReady,
-                'onStateChange': onPlayerStateChange
+                    onReady: onPlayerReady,
+                    onStateChange: onPlayerStateChange,
+                    onError: onPlayerError
                 }
             });
         }
 
+
+        function onPlayerReady(event) {
+            console.log("Плеер готов!");
+            console.log(player.getIframe().src)
+            console.log(player.getIframe().outerHTML)
+        }
+
+        function onPlayerStateChange(event) {
+            console.log("Состояние:", event.data);
+        }
+
+        function onPlayerError(event) {
+            console.log("YouTube error code:", event.data);
+        }
+
         socket.on('load_video', (data) => {
-            player.loadVideoByUrl(data.url)
+            const parsedUrl = new URL(data.url);
+
+            const finalId =  parsedUrl.searchParams.get('v');
+            player.loadVideoById(finalId)
         })
 
         socket.emit('join_room', {
@@ -49,6 +84,6 @@
             username: localStorage.getItem('username')
         })
     </script>
-
+    <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
