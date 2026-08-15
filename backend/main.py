@@ -55,4 +55,13 @@ async def join_room(sid, data):
 
 @sio.on('load_video')
 async def load_video(sid, data):
+    print(f'На сервере: загрузка видео от {sid}')
     await sio.emit('load_video', data, room=relations[sid]['room'])
+
+@sio.on('play_video')
+async def play_video(sid):
+    await sio.emit('play_video', room=relations[sid]['room'], skip_sid=sid)
+
+@sio.on('pause_video')
+async def pause_video(sid):
+    await sio.emit('pause_video', room=relations[sid]['room'], skip_sid=sid)

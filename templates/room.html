@@ -27,6 +27,7 @@
         const videoBtn = document.getElementById('newVideoBtn');
         const urlTextInput = document.getElementById('videoUrl');
         const socket = io();
+        let isSync = false;
 
         videoBtn.addEventListener('click', () => {
             const uurl = urlTextInput.value;
@@ -59,13 +60,28 @@
 
 
         function onPlayerReady(event) {
+            event.target.mute()
             console.log("Плеер готов!");
-            console.log(player.getIframe().src)
-            console.log(player.getIframe().outerHTML)
         }
 
         function onPlayerStateChange(event) {
-            console.log("Состояние:", event.data);
+            if (event.data == YT.PlayerState.PLAYING) {
+                if (!isSync) {
+                    console.log("Плеер начал проигрывать видео - отправка на сервер");
+
+                    socket.emit('play_video');
+                } else {
+                    isSync = false;
+                }
+            } else if (event.data == YT.PlayerState.PAUSED) {
+                if (!isSync) {
+                    console.log("Плеер на паузе - отправка на сервер");
+
+                    socket.emit('pause_video');
+                } else {
+                    isSync = false;
+                }
+            }
         }
 
         function onPlayerError(event) {
@@ -74,9 +90,22 @@
 
         socket.on('load_video', (data) => {
             const parsedUrl = new URL(data.url);
+            console.log('Видео Загрузилось');
 
             const finalId =  parsedUrl.searchParams.get('v');
-            player.loadVideoById(finalId)
+            player.cueVideoById(finalId);
+        })
+
+        socket.on('play_video', () => {
+            console.log("Плеер начал проигрывать видео - клинет принял, воспроизводим");
+            isSync = true;
+            player.playVideo();
+        })
+
+        socket.on('pause_video', () => {
+            console.log("Плеер на паузе - клиент принял, остановка");
+            isSync = true;
+            player.pauseVideo();
         })
 
         socket.emit('join_room', {
