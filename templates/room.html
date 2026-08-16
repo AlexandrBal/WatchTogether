@@ -28,6 +28,7 @@
         const urlTextInput = document.getElementById('videoUrl');
         const socket = io();
         let isSync = false;
+        let playerReady = false;
 
         videoBtn.addEventListener('click', () => {
             const uurl = urlTextInput.value;
@@ -58,9 +59,14 @@
             });
         }
 
+        setInterval(() => {
+            if (!player) return;
+            socket.emit('set_current_time', {currentT: player.getCurrentTime()})
+        }, 200)
 
         function onPlayerReady(event) {
-            event.target.mute()
+            event.target.mute();
+            playerReady = true;
             console.log("Плеер готов!");
         }
 
@@ -69,7 +75,9 @@
                 if (!isSync) {
                     console.log("Плеер начал проигрывать видео - отправка на сервер");
 
-                    socket.emit('play_video');
+                    socket.emit('play_video', {
+                        currentTime: player.getCurrentTime()
+                    });
                 } else {
                     isSync = false;
                 }
@@ -88,17 +96,22 @@
             console.log("YouTube error code:", event.data);
         }
 
-        socket.on('load_video', (data) => {
-            const parsedUrl = new URL(data.url);
+        function loadVideo(url) {
+            const parsedUrl = new URL(url);
             console.log('Видео Загрузилось');
 
             const finalId =  parsedUrl.searchParams.get('v');
             player.cueVideoById(finalId);
+        }
+
+        socket.on('load_video', (data) => {
+            loadVideo(data.url)
         })
 
-        socket.on('play_video', () => {
+        socket.on('play_video', (data) => {
             console.log("Плеер начал проигрывать видео - клинет принял, воспроизводим");
             isSync = true;
+            player.seekTo(data.currentTime, true);
             player.playVideo();
         })
 
@@ -111,6 +124,18 @@
         socket.emit('join_room', {
             room_id: '{{ room_id }}',
             username: localStorage.getItem('username')
+        })
+
+        socket.on('join_room', (data) => {
+            if (data.curVid) {
+                loadVideo(data.curVid);
+            }
+            player.seekTo(data.curT, true);
+            if (!data.isPlaying) {
+                player.pauseVideo();
+            } else {
+                player.playVideo();
+            }
         })
     </script>
     <script src="https://www.youtube.com/iframe_api"></script>

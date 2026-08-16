@@ -1,360 +1,614 @@
+/* ========================================
+   RESET
+======================================== */
+
 * {
     box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
+
+/* ========================================
+   BODY
+======================================== */
+
 body {
-    margin: 0;
     min-height: 100vh;
 
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
 
-    gap: 25px;
+    gap: 24px;
 
-    padding: 30px;
+    padding: 50px 20px;
 
     font-family: Arial, sans-serif;
 
+    color: #ffffff;
+
     background:
         radial-gradient(
-            circle at 15% 20%,
-            #3b1f5e,
+            circle at 15% 15%,
+            rgba(108, 92, 231, 0.18),
             transparent 35%
         ),
         radial-gradient(
-            circle at 85% 80%,
-            #163b5c,
+            circle at 85% 85%,
+            rgba(0, 180, 255, 0.10),
             transparent 35%
         ),
-        #0f1117;
-
-    color: #f5f5f5;
+        #0b0b12;
 }
 
 
-/* Общий контейнер */
+/* ========================================
+   COMMON CONTAINER
+======================================== */
 
 .container {
+    position: relative;
+
     width: 100%;
-    max-width: 500px;
+    max-width: 520px;
 
-    padding: 35px;
+    padding: 30px;
 
-    background: rgba(255, 255, 255, 0.07);
+    background: rgba(255, 255, 255, 0.055);
 
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.09);
 
     border-radius: 24px;
 
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+
     box-shadow:
-        0 25px 60px rgba(0, 0, 0, 0.45);
+        0 20px 60px rgba(0, 0, 0, 0.45),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04);
 
-    backdrop-filter: blur(15px);
+    transition:
+        transform 0.25s ease,
+        border-color 0.25s ease,
+        box-shadow 0.25s ease;
+}
 
-    text-align: center;
+.container:hover {
+    transform: translateY(-2px);
+
+    border-color: rgba(255, 255, 255, 0.14);
+
+    box-shadow:
+        0 25px 70px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 
-/* =========================
-   USERNAME
-   ========================= */
+/* ========================================
+   USERNAME CONTAINER
+======================================== */
+
+.username-container {
+    overflow: hidden;
+}
+
+.username-container::before {
+    content: "";
+
+    position: absolute;
+
+    width: 180px;
+    height: 180px;
+
+    top: -100px;
+    right: -80px;
+
+    border-radius: 50%;
+
+    background: rgba(108, 92, 231, 0.15);
+
+    filter: blur(50px);
+
+    pointer-events: none;
+}
+
+
+/* ========================================
+   USERNAME TITLE
+======================================== */
 
 .username-container h2 {
-    margin-top: 0;
-    margin-bottom: 25px;
+    position: relative;
 
-    font-size: 22px;
+    margin-bottom: 20px;
+
+    font-size: 21px;
+    font-weight: 600;
 }
 
+
+/* ========================================
+   USERNAME FORM
+======================================== */
 
 .username-form {
     display: flex;
+
     gap: 10px;
+
+    width: 100%;
 }
 
-
-#usernameInput {
+.username-form input {
     flex: 1;
+}
 
-    min-width: 0;
+.username-form button {
+    width: auto;
 
-    padding: 14px 16px;
+    min-width: 120px;
 
-    border: 1px solid rgba(255, 255, 255, 0.12);
-
-    border-radius: 12px;
-
-    outline: none;
-
-    background: rgba(0, 0, 0, 0.25);
-
-    color: white;
-
-    font-size: 15px;
-
-    transition:
-        border-color 0.2s,
-        box-shadow 0.2s;
+    margin-top: 0;
 }
 
 
-#usernameInput::placeholder {
-    color: #858995;
-}
-
-
-#usernameInput:focus {
-    border-color: #8b5cf6;
-
-    box-shadow:
-        0 0 0 3px rgba(139, 92, 246, 0.15);
-}
-
-
-#createUsernameBtn {
-    padding: 0 20px;
-
-    border: none;
-    border-radius: 12px;
-
-    background: linear-gradient(
-        135deg,
-        #8b5cf6,
-        #6366f1
-    );
-
-    color: white;
-
-    font-weight: 600;
-
-    cursor: pointer;
-
-    transition:
-        transform 0.2s,
-        box-shadow 0.2s;
-}
-
-
-#createUsernameBtn:hover {
-    transform: translateY(-2px);
-
-    box-shadow:
-        0 8px 20px rgba(99, 102, 241, 0.35);
-}
-
-
-#createUsernameBtn:active {
-    transform: translateY(0);
-}
-
+/* ========================================
+   CURRENT USERNAME
+======================================== */
 
 .current-username {
-    margin-bottom: 0;
+    margin-top: 17px;
 
-    color: #a9adba;
+    color: rgba(255, 255, 255, 0.5);
 
     font-size: 14px;
 }
 
-
 #username {
-    color: #c4b5fd;
+    color: #aaa1ff;
 
     font-weight: 600;
 }
 
 
-/* =========================
-   ROOM
-   ========================= */
+/* ========================================
+   ROOM CONTAINER
+======================================== */
 
 .room-container {
-    position: relative;
+    text-align: center;
+
+    overflow: hidden;
+}
+
+.room-container::before {
+    content: "";
+
+    position: absolute;
+
+    width: 220px;
+    height: 220px;
+
+    left: 50%;
+    top: -150px;
+
+    transform: translateX(-50%);
+
+    border-radius: 50%;
+
+    background: rgba(108, 92, 231, 0.18);
+
+    filter: blur(55px);
+
+    pointer-events: none;
 }
 
 
+/* ========================================
+   LOGO
+======================================== */
+
 .logo {
-    width: 60px;
-    height: 60px;
+    position: relative;
+
+    width: 58px;
+    height: 58px;
 
     display: flex;
     align-items: center;
     justify-content: center;
 
-    margin: 0 auto 20px;
+    margin: 0 auto 18px;
 
     border-radius: 18px;
 
+    font-size: 25px;
+
     background: linear-gradient(
         135deg,
-        #8b5cf6,
-        #6366f1
+        #6c5ce7,
+        #5142c7
     );
 
-    font-size: 24px;
-
     box-shadow:
-        0 10px 30px rgba(99, 102, 241, 0.3);
+        0 10px 35px rgba(90, 70, 220, 0.35);
 }
 
 
-h1 {
-    margin: 0 0 12px;
+/* ========================================
+   MAIN TITLE
+======================================== */
 
-    font-size: 36px;
+.room-container h1 {
+    position: relative;
+
+    margin-bottom: 12px;
+
+    font-size: 40px;
+    font-weight: 700;
 
     letter-spacing: -1px;
+
+    background: linear-gradient(
+        135deg,
+        #ffffff,
+        #aaa1ff
+    );
+
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 
+/* ========================================
+   SUBTITLE
+======================================== */
+
 .subtitle {
-    margin: 0 auto 30px;
+    position: relative;
 
     max-width: 380px;
 
-    color: #a9adba;
+    margin: 0 auto 25px;
 
-    font-size: 16px;
+    color: rgba(255, 255, 255, 0.52);
+
+    font-size: 15px;
+
+    line-height: 1.6;
+}
+
+
+/* ========================================
+   ENTRANCE CONTAINER
+======================================== */
+
+.entrance-container {
+    overflow: hidden;
+}
+
+.entrance-container::before {
+    content: "";
+
+    position: absolute;
+
+    width: 190px;
+    height: 190px;
+
+    right: -100px;
+    bottom: -120px;
+
+    border-radius: 50%;
+
+    background: rgba(0, 170, 255, 0.10);
+
+    filter: blur(55px);
+
+    pointer-events: none;
+}
+
+
+/* ========================================
+   ENTRANCE TITLE
+======================================== */
+
+.entrance-container h2 {
+    position: relative;
+
+    margin-bottom: 20px;
+
+    font-size: 20px;
+    font-weight: 600;
+
+    color: #ffffff;
+}
+
+
+/* ========================================
+   ENTRANCE FORM
+======================================== */
+
+.entranceForm {
+    position: relative;
+
+    display: flex;
+
+    gap: 10px;
+
+    width: 100%;
+}
+
+.entranceForm input {
+    flex: 1;
+}
+
+.entranceForm button {
+    width: auto;
+
+    min-width: 110px;
+
+    margin-top: 0;
+}
+
+
+/* ========================================
+   INPUT
+======================================== */
+
+input {
+    width: 100%;
+
+    padding: 14px 16px;
+
+    border: 1px solid rgba(255, 255, 255, 0.11);
+
+    border-radius: 13px;
+
+    outline: none;
+
+    background: rgba(0, 0, 0, 0.22);
+
+    color: #ffffff;
+
+    font-family: inherit;
+    font-size: 14px;
+
+    transition:
+        border-color 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+input::placeholder {
+    color: rgba(255, 255, 255, 0.32);
+}
+
+input:hover {
+    border-color: rgba(255, 255, 255, 0.18);
+}
+
+input:focus {
+    border-color: rgba(122, 105, 255, 0.7);
+
+    background: rgba(0, 0, 0, 0.3);
+
+    box-shadow:
+        0 0 0 4px rgba(108, 92, 231, 0.12);
+}
+
+
+/* ========================================
+   BUTTON
+======================================== */
+
+button {
+    position: relative;
+
+    width: 100%;
+
+    padding: 14px 18px;
+
+    margin-top: 12px;
+
+    border: none;
+
+    border-radius: 13px;
+
+    cursor: pointer;
+
+    color: #ffffff;
+
+    font-family: inherit;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    background: linear-gradient(
+        135deg,
+        #6c5ce7,
+        #5142c7
+    );
+
+    box-shadow:
+        0 8px 25px rgba(90, 70, 220, 0.28);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        filter 0.2s ease;
+}
+
+button:hover {
+    transform: translateY(-2px);
+
+    filter: brightness(1.08);
+
+    box-shadow:
+        0 12px 32px rgba(90, 70, 220, 0.38);
+}
+
+button:active {
+    transform: translateY(0);
+
+    box-shadow:
+        0 5px 16px rgba(90, 70, 220, 0.25);
+}
+
+
+/* ========================================
+   CREATE ROOM RESULT
+======================================== */
+
+#parag {
+    margin-top: 18px;
+
+    color: rgba(255, 255, 255, 0.65);
+
+    font-size: 14px;
 
     line-height: 1.5;
 }
 
-
-#createRoomBtn {
-    width: 100%;
-
-    padding: 15px 20px;
-
-    border: none;
-
-    border-radius: 12px;
-
-    background: linear-gradient(
-        135deg,
-        #8b5cf6,
-        #6366f1
-    );
-
-    color: white;
-
-    font-size: 16px;
-
-    font-weight: 600;
-
-    cursor: pointer;
-
-    transition:
-        transform 0.2s,
-        box-shadow 0.2s;
-}
-
-
-#createRoomBtn:hover {
-    transform: translateY(-2px);
-
-    box-shadow:
-        0 10px 25px rgba(99, 102, 241, 0.35);
-}
-
-
-#createRoomBtn:active {
-    transform: translateY(0);
-}
-
-
-#parag {
-    min-height: 25px;
-
-    margin: 20px 0 0;
-
-    color: #c8cad3;
-
-    font-size: 14px;
-}
-
-
 #parag a {
-    color: #a78bfa;
+    color: #aaa1ff;
 
     font-weight: 600;
 
     text-decoration: none;
 
-    transition: color 0.2s;
+    transition:
+        color 0.2s ease,
+        text-shadow 0.2s ease;
 }
-
 
 #parag a:hover {
-    color: #c4b5fd;
+    color: #c7c1ff;
 
-    text-decoration: underline;
+    text-shadow:
+        0 0 15px rgba(130, 110, 255, 0.5);
 }
 
-/* =========================
+
+/* ========================================
    ROOM INFO
-   ========================= */
+======================================== */
 
 #roomInfo {
     display: none;
 
-    flex-direction: column;
     align-items: center;
+    justify-content: center;
 
-    gap: 8px;
+    gap: 10px;
 
-    margin-top: 20px;
-    padding: 15px 20px;
+    margin-top: 15px;
 
-    border: 1px solid rgba(139, 92, 246, 0.2);
-    border-radius: 14px;
+    padding: 11px 15px;
 
-    background: rgba(139, 92, 246, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+
+    border-radius: 12px;
+
+    background: rgba(0, 0, 0, 0.18);
 }
 
 .room-label {
-    color: #858995;
+    color: rgba(255, 255, 255, 0.4);
 
-    font-size: 12px;
-    font-weight: 600;
-
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    font-size: 13px;
 }
 
 #roomID {
-    color: #c4b5fd;
+    color: #aaa1ff;
 
-    font-size: 20px;
-    font-weight: 700;
+    font-size: 13px;
 
-    letter-spacing: 2px;
+    font-family: monospace;
+
+    font-weight: 600;
+
+    word-break: break-all;
 }
 
-/* =========================
-   MOBILE
-   ========================= */
 
-@media (max-width: 550px) {
+/* ========================================
+   ERROR
+======================================== */
+
+#errorP {
+    min-height: 20px;
+
+    margin-top: 14px;
+
+    color: #ff7b8a;
+
+    font-size: 13px;
+
+    text-align: center;
+}
+
+
+/* ========================================
+   LINKS
+======================================== */
+
+a {
+    color: #aaa1ff;
+
+    text-decoration: none;
+
+    font-weight: 600;
+
+    transition:
+        color 0.2s ease,
+        text-shadow 0.2s ease;
+}
+
+a:hover {
+    color: #c7c1ff;
+
+    text-shadow:
+        0 0 15px rgba(130, 110, 255, 0.5);
+}
+
+
+/* ========================================
+   MOBILE
+======================================== */
+
+@media (max-width: 600px) {
 
     body {
-        padding: 20px;
+        padding: 25px 15px;
+
+        gap: 18px;
     }
 
     .container {
-        padding: 25px 20px;
+        padding: 24px 20px;
+
+        border-radius: 20px;
     }
 
-    .username-form {
+    .room-container h1 {
+        font-size: 32px;
+    }
+
+    .username-form,
+    .entranceForm {
         flex-direction: column;
     }
 
-    #createUsernameBtn {
-        padding: 14px;
+    .username-form button,
+    .entranceForm button {
+        width: 100%;
     }
 
-    h1 {
-        font-size: 29px;
+    .logo {
+        width: 52px;
+        height: 52px;
+
+        border-radius: 16px;
     }
 }
