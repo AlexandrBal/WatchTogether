@@ -29,6 +29,8 @@
         const socket = io();
         let isSync = false;
         let playerReady = false;
+        let pendingRoomState;
+        let roomJoined = false;
 
         videoBtn.addEventListener('click', () => {
             const uurl = urlTextInput.value;
@@ -60,7 +62,7 @@
         }
 
         setInterval(() => {
-            if (!player) return;
+            if (!player || !playerReady || !roomJoined) return;
             socket.emit('set_current_time', {currentT: player.getCurrentTime()})
         }, 200)
 
@@ -68,9 +70,21 @@
             event.target.mute();
             playerReady = true;
             console.log("Плеер готов!");
+            socket.emit('join_room', {
+                room_id: '{{ room_id }}',
+                username: localStorage.getItem('username')
+            })
         }
 
         function onPlayerStateChange(event) {
+            console.log(
+                "STATE:",
+                event.data,
+                "isSync:",
+                isSync,
+                "pending:",
+                pendingRoomState
+            );
             if (event.data == YT.PlayerState.PLAYING) {
                 if (!isSync) {
                     console.log("Плеер начал проигрывать видео - отправка на сервер");
@@ -88,6 +102,29 @@
                     socket.emit('pause_video');
                 } else {
                     isSync = false;
+                }
+            } else if (event.data == YT.PlayerState.CUED) {
+                console.log("=== CUED ===");
+                console.log("pendingRoomState:", pendingRoomState);
+
+                if (!pendingRoomState) {
+                console.log('Нет ожидающего состояния комнаты');
+                return;
+                }
+
+                const state = pendingRoomState;
+                pendingRoomState = null;
+
+                console.log("Восстанавливаем:", state);
+                isSync = true;
+                player.seekTo(state.curT, true);
+
+                if (state.isPlaying == true) {
+                    console.log("Восстанавливаем PLAY");
+                    player.playVideo();
+                } else {
+                    console.log("Восстанавливаем PAUSE");
+                    player.pauseVideo();
                 }
             }
         }
@@ -121,21 +158,18 @@
             player.pauseVideo();
         })
 
-        socket.emit('join_room', {
-            room_id: '{{ room_id }}',
-            username: localStorage.getItem('username')
-        })
-
         socket.on('join_room', (data) => {
-            if (data.curVid) {
-                loadVideo(data.curVid);
+            console.log('Произошёл вход в комнату')
+            roomJoined = true;
+            
+            if (!data.curVid) {
+                console.log('В этой комнате пока нет видео...')
+                return
             }
-            player.seekTo(data.curT, true);
-            if (!data.isPlaying) {
-                player.pauseVideo();
-            } else {
-                player.playVideo();
-            }
+            pendingRoomState = data;
+
+            loadVideo(data.curVid)
+            
         })
     </script>
     <script src="https://www.youtube.com/iframe_api"></script>

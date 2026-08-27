@@ -86,11 +86,11 @@ async def join_room(sid, data):
         }
     else:
         roomsInfo[relations[sid]['room']]['users'].append(sid)
-        await sio.emit('join_room', {
-            'curT': roomsInfo[relations[sid]['room']]['current_time'],
-            'curVid': roomsInfo[relations[sid]['room']]['current_video'],
-            'isPlaying': roomsInfo[relations[sid]['room']]['playing']
-            }, to=sid)
+    await sio.emit('join_room', {
+        'curT': roomsInfo[relations[sid]['room']]['current_time'],
+        'curVid': roomsInfo[relations[sid]['room']]['current_video'],
+        'isPlaying': roomsInfo[relations[sid]['room']]['playing']
+        }, to=sid)
 
 @sio.on('load_video')
 async def load_video(sid, data):
