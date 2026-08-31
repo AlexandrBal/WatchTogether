@@ -27,7 +27,7 @@
         const videoBtn = document.getElementById('newVideoBtn');
         const urlTextInput = document.getElementById('videoUrl');
         const socket = io();
-        let isSync = false;
+        let isRemote = false;
         let playerReady = false;
         let pendingRoomState;
         let roomJoined = false;
@@ -77,54 +77,31 @@
         }
 
         function onPlayerStateChange(event) {
-            console.log(
-                "STATE:",
-                event.data,
-                "isSync:",
-                isSync,
-                "pending:",
-                pendingRoomState
-            );
+            console.log(event.data)
             if (event.data == YT.PlayerState.PLAYING) {
-                if (!isSync) {
-                    console.log("Плеер начал проигрывать видео - отправка на сервер");
-
+                if (!isRemote) {
                     socket.emit('play_video', {
                         currentTime: player.getCurrentTime()
                     });
                 } else {
-                    isSync = false;
+                    isRemote = false;
                 }
             } else if (event.data == YT.PlayerState.PAUSED) {
-                if (!isSync) {
-                    console.log("Плеер на паузе - отправка на сервер");
-
+                if (!isRemote) {
                     socket.emit('pause_video');
                 } else {
-                    isSync = false;
+                    isRemote = false;
                 }
             } else if (event.data == YT.PlayerState.CUED) {
-                console.log("=== CUED ===");
-                console.log("pendingRoomState:", pendingRoomState);
-
                 if (!pendingRoomState) {
-                console.log('Нет ожидающего состояния комнаты');
                 return;
                 }
 
                 const state = pendingRoomState;
                 pendingRoomState = null;
 
-                console.log("Восстанавливаем:", state);
-                isSync = true;
-                player.seekTo(state.curT, true);
-
-                if (state.isPlaying == true) {
-                    console.log("Восстанавливаем PLAY");
+                if (state.isPlaying) {
                     player.playVideo();
-                } else {
-                    console.log("Восстанавливаем PAUSE");
-                    player.pauseVideo();
                 }
             }
         }
@@ -133,12 +110,14 @@
             console.log("YouTube error code:", event.data);
         }
 
-        function loadVideo(url) {
+        function loadVideo(url, startSec=0, playing=false) {
             const parsedUrl = new URL(url);
-            console.log('Видео Загрузилось');
-
             const finalId =  parsedUrl.searchParams.get('v');
-            player.cueVideoById(finalId);
+            player.cueVideoById(finalId, startSec);
+            if (!playing) {
+                player.playVideo();
+                player.pauseVideo();
+            }
         }
 
         socket.on('load_video', (data) => {
@@ -146,30 +125,28 @@
         })
 
         socket.on('play_video', (data) => {
-            console.log("Плеер начал проигрывать видео - клинет принял, воспроизводим");
-            isSync = true;
+            isRemote = true;
             player.seekTo(data.currentTime, true);
             player.playVideo();
         })
 
         socket.on('pause_video', () => {
-            console.log("Плеер на паузе - клиент принял, остановка");
-            isSync = true;
+            isRemote = true;
             player.pauseVideo();
         })
 
         socket.on('join_room', (data) => {
-            console.log('Произошёл вход в комнату')
             roomJoined = true;
             
             if (!data.curVid) {
-                console.log('В этой комнате пока нет видео...')
                 return
             }
             pendingRoomState = data;
-
-            loadVideo(data.curVid)
-            
+            if (data.isPlaying) {
+                loadVideo(data.curVid, data.curT, true);
+            } else {
+                loadVideo(data.curVid, data.curT, false);
+            }
         })
     </script>
     <script src="https://www.youtube.com/iframe_api"></script>

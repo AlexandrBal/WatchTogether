@@ -82,7 +82,8 @@ async def join_room(sid, data):
             'users': [sid],
             'current_video': '',
             'current_time': 0,
-            'playing': False
+            'playing': False,
+            'host_sid': sid
         }
     else:
         roomsInfo[relations[sid]['room']]['users'].append(sid)
@@ -103,6 +104,9 @@ async def load_video(sid, data):
 async def set_current_time(sid, data):
     if sid not in relations:
         return
+    if roomsInfo[relations[sid]['room']]['host_sid'] != sid:
+        return
+    
     room = relations[sid]['room']
 
     if room not in roomsInfo:
