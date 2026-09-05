@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/indexStyles.css">
+    <title>Root</title>
+</head>
+<body>
+
+    <div class="container username-container">
+        <h2>👤 Ваш профиль</h2>
+
+        <div class="username-form">
+            <input
+                type="text"
+                id="usernameInput"
+                placeholder="Введите ваше имя..."
+                maxlength="30"
+            >
+
+            <button id="createUsernameBtn">
+                Установить
+            </button>
+        </div>
+
+        <p class="current-username">
+            Ваше имя:
+            <span id="username">Не установлено</span>
+        </p>
+    </div>
+
+    <div class="container room-container">
+
+        <div class="logo">▶</div>
+
+        <h1>Watch Together</h1>
+
+        <p class="subtitle">
+            Создай комнату и пригласи друзей
+            для совместного просмотра.
+        </p>
+
+        <button
+            id="createRoomBtn"
+        >
+            Создать комнату
+        </button>
+
+        <p id="parag"></p>
+        <div id="roomInfo">
+            <span class="room-label">Код комнаты</span>
+            <span id="roomID"></span>
+        </div>
+
+    </div>
+
+    <div class="container entrance-container">
+        <h2>Для входа введите ID комнаты:</h2>
+
+        <div class="entranceForm">
+            <input type="text" id="entranceID" placeholder="Введите ID комнаты...">
+
+            <button id="entranceBtn">Войти</button>
+        </div>
+
+        <p id="errorP"></p>
+    </div>
+
+    <script src="/static/js/indexScr.js"></script>
+</body>
+</html>

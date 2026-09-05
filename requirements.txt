@@ -3,3 +3,4 @@ uvicorn[standard]
 python-socketio
 jinja2
 pydantic
+https://www.youtube.com/watch?v=jBrFZqs4-yE

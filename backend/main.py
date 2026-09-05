@@ -20,15 +20,19 @@ templates.env.cache = None
 app.mount(
     "/static",
     StaticFiles(directory="static"),
-    name="static")
+    name="static"
+)
 
 relations = {}
 
 roomsInfo = {}
 
 @app.get('/')
-async def index():
-    return FileResponse("static/index.html")
+async def index(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name = 'index.html'
+    )
 
 @app.post('/create_room')
 async def create_room():
