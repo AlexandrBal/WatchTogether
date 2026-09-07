@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse, FileResponse
 from fastapi.templating import Jinja2Templates
 import secrets
 import socketio
+from pydantic import BaseModel
 
 app = FastAPI()
 
@@ -23,6 +24,16 @@ app.mount(
     name="static"
 )
 
+class JoinRoom(BaseModel):
+    username: str
+    room_id: str
+
+class LoadVideo(BaseModel):
+    url: str
+
+class CurrentTime(BaseModel):
+    currentT: float
+    
 relations = {}
 
 roomsInfo = {}
@@ -75,14 +86,15 @@ async def disconnect(sid):
 
 @sio.on('join_room')
 async def join_room(sid, data):
+    data = JoinRoom.model_validate(data)
     relations[sid] = {
-        'name': data['username'],
-        'room': data['room_id']
+        'name': data.username,
+        'room': data.room_id
     }
-    await sio.enter_room(sid, data['room_id'])
+    await sio.enter_room(sid, data.room_id)
 
     if relations[sid]['room'] not in roomsInfo:
-        roomsInfo[data['room_id']] = {
+        roomsInfo[data.room_id] = {
             'users': [sid],
             'current_video': '',
             'current_time': 0,
@@ -99,13 +111,15 @@ async def join_room(sid, data):
 
 @sio.on('load_video')
 async def load_video(sid, data):
-    roomsInfo[relations[sid]['room']]['current_video'] = data['url']
+    data = LoadVideo.model_validate(data)
+    roomsInfo[relations[sid]['room']]['current_video'] = data.url
     roomsInfo[relations[sid]['room']]['current_time'] = 0
     roomsInfo[relations[sid]['room']]['playing'] = False
     await sio.emit('load_video', data, room=relations[sid]['room'])
 
 @sio.on('set_current_time')
 async def set_current_time(sid, data):
+    data = CurrentTime.model_validate(data)
     if sid not in relations:
         return
     if roomsInfo[relations[sid]['room']]['host_sid'] != sid:
@@ -116,7 +130,7 @@ async def set_current_time(sid, data):
     if room not in roomsInfo:
         return
 
-    roomsInfo[room]['current_time'] = data['currentT']
+    roomsInfo[room]['current_time'] = data.currentT
 
 @sio.on('play_video')
 async def play_video(sid, data):
