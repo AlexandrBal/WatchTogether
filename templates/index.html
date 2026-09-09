@@ -56,16 +56,20 @@
     </div>
 
     <div class="container entrance-container">
-        <h2>Для входа введите ID комнаты:</h2>
+    <h2>Для входа введите ID комнаты:</h2>
+    <div class="entranceForm">
+        <input
+            type="text"
+            id="entranceID"
+            placeholder="Введите ID комнаты..."
+        >
 
-        <div class="entranceForm">
-            <input type="text" id="entranceID" placeholder="Введите ID комнаты...">
-
-            <button id="entranceBtn">Войти</button>
-        </div>
-
-        <p id="errorP"></p>
+        <button id="entranceBtn">Войти</button>
     </div>
+
+    <p id="errorP" class="entranceError"></p>
+    </div>
+
 
     <script src="/static/js/indexScr.js"></script>
 </body>
