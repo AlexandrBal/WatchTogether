@@ -24,8 +24,8 @@ roomBtn.addEventListener('click', async () => {
 })
 
 usernameBtn.addEventListener('click', () => {
-    const username = usernameInp.value
-    if (username.trim() === "") return;
+    const username = usernameInp.value.trim()
+    if (username === "") return;
     globalUsername = username;
 
     spanUsername.innerText = username;

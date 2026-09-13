@@ -1,10 +1,10 @@
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import JSONResponse, FileResponse
+from fastapi.responses import JSONResponse
 from fastapi.templating import Jinja2Templates
 import secrets
 import socketio
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, AnyHttpUrl
 
 app = FastAPI()
 
@@ -25,14 +25,14 @@ app.mount(
 )
 
 class JoinRoom(BaseModel):
-    username: str
-    room_id: str
+    username: str = Field(min_length=1, max_length=20)
+    room_id: str = Field(min_length=1)
 
 class LoadVideo(BaseModel):
-    url: str
+    url: AnyHttpUrl
 
 class CurrentTime(BaseModel):
-    currentT: float
+    currentT: float = Field(ge=0)
     
 relations = {}
 
@@ -81,6 +81,8 @@ async def disconnect(sid):
 
         if not roomsInfo[room]['users']:
             del roomsInfo[room]
+        else:
+            roomsInfo[room]['host_sid'] = roomsInfo[room]['users'][0]
 
     del relations[sid]
 
@@ -112,10 +114,10 @@ async def join_room(sid, data):
 @sio.on('load_video')
 async def load_video(sid, data):
     data = LoadVideo.model_validate(data)
-    roomsInfo[relations[sid]['room']]['current_video'] = data.url
+    roomsInfo[relations[sid]['room']]['current_video'] = str(data.url)
     roomsInfo[relations[sid]['room']]['current_time'] = 0
     roomsInfo[relations[sid]['room']]['playing'] = False
-    await sio.emit('load_video', data, room=relations[sid]['room'])
+    await sio.emit('load_video', data.model_dump(mode='json'), room=relations[sid]['room'])
 
 @sio.on('set_current_time')
 async def set_current_time(sid, data):
@@ -129,7 +131,6 @@ async def set_current_time(sid, data):
 
     if room not in roomsInfo:
         return
-
     roomsInfo[room]['current_time'] = data.currentT
 
 @sio.on('play_video')
